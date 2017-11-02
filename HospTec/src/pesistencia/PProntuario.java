@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pesistencia;
 
-import conexao.Conexao;
+import util.Conexao;
 import entidade.EProntuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +10,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Onix
+ * @author Vicente
  */
 public class PProntuario {
 
@@ -38,7 +33,7 @@ public class PProntuario {
 
             JOptionPane.showMessageDialog(null, "Salvo com sucesso!");
         } catch (Exception e) {
-            throw new Exception("Erro ao tentar Salvar. " + e.getCause());
+            throw new Exception("Erro ao incluir");
         }
     }
 
@@ -47,7 +42,7 @@ public class PProntuario {
         try {
 
         } catch (Exception e) {
-            throw new Exception("Erro ao tentar Pesquisar. " + e.getCause());
+            throw new Exception("Erro ao pesquisar");
         }
         return null;
     }
@@ -58,7 +53,7 @@ public class PProntuario {
         try {
 
         } catch (Exception e) {
-            throw new Exception("Erro ao tentar Alterar. " + e.getCause());
+            throw new Exception("Erro ao alterar");
         }
     }
 
@@ -68,7 +63,7 @@ public class PProntuario {
         try {
 
         } catch (Exception e) {
-            throw new Exception("Erro ao tentar Excluir. " + e.getCause());
+            throw new Exception("Erro ao excluir");
         }
     }
 
@@ -92,7 +87,7 @@ public class PProntuario {
             stmt.close();
             rs.close();
         } catch (Exception e) {
-            throw new Exception("Erro ao tentar Listar. " + e.getCause());
+            throw new Exception("Erro ao listar");
         }
         return null;
     }
