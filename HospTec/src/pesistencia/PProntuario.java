@@ -1,10 +1,15 @@
 package pesistencia;
 
+import entidade.EMedico;
+import entidade.EPaciente;
 import util.Conexao;
 import entidade.EProntuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
@@ -13,22 +18,33 @@ import javax.swing.JOptionPane;
  * @author Vicente
  */
 public class PProntuario {
-
-    public void inserir(EProntuario p) throws Exception {
-        String sql = "INSERT INTO tb_prontuario(data, descricao, data_retorno, receituario, paciente, medico)VALUES(?, ?, ?, ?, ?, ?)";
+    
+    EProntuario ePr = null;
+    
+    public void inserir(EProntuario ePr) throws Exception {
+        String sql = "INSERT INTO tb_prontuario(data, descricao, receituario, paciente, medico)VALUES(?, ?, ?, ?, ?)";
 
         try {
             Connection con = Conexao.getConexao();
-            PreparedStatement stmt = con.prepareStatement(sql);
+            PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            stmt.setString(1, p.getData());
-            stmt.setString(2, p.getDescricao());
-            stmt.setString(3, p.getData_retorno());
-            stmt.setString(4, p.getReceituario());
-            stmt.setInt(5, p.getPaciente().getId());
-            stmt.setInt(6, p.getMedico().getId());
+            DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+            java.sql.Date data = new java.sql.Date(fmt.parse(ePr.getData()).getTime());
+
+            stmt.setDate(1, data);
+            stmt.setString(2, ePr.getDescricao());
+            stmt.setString(3, ePr.getReceituario());
+            stmt.setInt(4, ePr.getPaciente().getId());
+            stmt.setInt(5, ePr.getMedico().getId());
 
             stmt.execute();
+
+            //comando para pegar id gerado pelo banco de dados
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                ePr.setId(rs.getInt("id"));
+            }
+            rs.close();
             stmt.close();
 
             JOptionPane.showMessageDialog(null, "Salvo com sucesso!");
@@ -37,19 +53,30 @@ public class PProntuario {
         }
     }
 
-    public EProntuario pesquisar(int id) throws Exception {
+    public EProntuario pesquisar(int id) throws Exception {        //eu parei aqui no pesquisar
         String sql = "SELECT * FROM tb_prontuario WHERE id = ?";
-        try {
 
+        try {
+            Connection con = Conexao.getConexao();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                PPaciente pPac = new PPaciente();
+                PMedico pMed = new PMedico();
+                ePr = new EProntuario(rs.getInt("id"), rs.getString("data"), rs.getString("descricao"),
+                        rs.getString("receituario"), new PPaciente().consultar(rs.getInt("paciente")),
+                        new PMedico().consultar(rs.getInt("medico")));
+            }
         } catch (Exception e) {
             throw new Exception("Erro ao pesquisar");
         }
-        return null;
+        return ePr;
     }
 
-    public void alterar(EProntuario prontuario) throws Exception {
+    public void alterar(EProntuario ePr) throws Exception {
         String sql = "UPDATE tb_prontuario SET data = ?, descricao = ?, data_retorno = ?, receituario = ?, medico = ?, paciente = ? WHERE id = ?";
-
+//não te falei, que parei no pesquisar, p ra exlcuir eu preciso saber o que né?rsrs
         try {
 
         } catch (Exception e) {
@@ -78,10 +105,15 @@ public class PProntuario {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-//                EProntuario eP = new EProntuario(rs.getInt("id"), rs.getString("data"), rs.getString("descricao"),
-//                        rs.getString("data_retorno"), rs.getInt("paciente"), rs.getInt("medico"));
+                EMedico eMed = new EMedico(rs.getInt("medico"));
+                EPaciente ePac = new EPaciente();
+                ePac.setId(rs.getInt("paciente"));
 
-//                prontuarios.add(eP);
+                ePr = new EProntuario(rs.getInt("id"), rs.getString("data"), rs.getString("descricao"),
+                        rs.getString("receituario"), new PPaciente().consultar(rs.getInt("paciente")),
+                        new PMedico().consultar(rs.getInt("medico")));
+
+                prontuarios.add(ePr);
             }
 
             stmt.close();
@@ -89,6 +121,6 @@ public class PProntuario {
         } catch (Exception e) {
             throw new Exception("Erro ao listar");
         }
-        return null;
+        return prontuarios;
     }
 }

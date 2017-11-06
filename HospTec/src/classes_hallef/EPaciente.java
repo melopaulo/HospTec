@@ -1,4 +1,6 @@
-package entidade;
+package classes_hallef;
+
+
 
 /**
  * @author Hallef.sud
@@ -10,38 +12,10 @@ public class EPaciente {
     private String nome;
     private String rg;
     private String cpf;
-    private String endereco;
-    private String dataNascimento;
+    private String endereco; 
+    private String dataNascimento;//aqui é data no bd
     private String sexo;
     private String telefone;
-    
-    public EPaciente() {
-    }
-
-    public EPaciente(Integer id) {
-        this.id = id;
-    }
-    
-    public EPaciente(String nome, String rg, String cpf, String endereco, String dataNascimento, String sexo, String telefone) {
-        this.nome = nome;
-        this.rg = rg;
-        this.cpf = cpf;
-        this.endereco = endereco;
-        this.dataNascimento = dataNascimento;
-        this.sexo = sexo;
-        this.telefone = telefone;
-    }
-    
-    public EPaciente(Integer id, String nome, String rg, String cpf, String endereco, String dataNascimento, String sexo, String telefone) {
-        this.id = id;
-        this.nome = nome;
-        this.rg = rg;
-        this.cpf = cpf;
-        this.endereco = endereco;
-        this.dataNascimento = dataNascimento;
-        this.sexo = sexo;
-        this.telefone = telefone;
-    }
 
     /**
      * @return the id

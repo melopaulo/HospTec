@@ -1,23 +1,30 @@
-package pesistencia;
+package classes_hallef;
 
-import util.Conexao;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import entidade.EPaciente;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Hallef.sud
  */
 public class PPaciente {
     
-    public void incluir(EPaciente oPaciente) throws SQLException, Exception {
-        Connection connection = Conexao.getConexao();
+    Conexao oBanco;
+    
+    public PPaciente() {
+        oBanco = new Conexao();
+    }
+    
+    public void incluir(EPaciente oPaciente) {
+        Connection connection = oBanco.getConexao();
         StringBuffer sql = new StringBuffer();
-        sql.append(" INSERT INTO paciente (nome,rg,cpf,endereco,dt_nasc,sexo,telefone) VALUES(?,?,?,?,?,?,?) ");
+        sql.append(" INSERT INTO tb_paciente (nome,rg,cpf,endereco,dt_nasc,sexo,telefone) VALUES(?,?,?,?,?,?,?) ");
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.toString());
             preparedStatement.setString(1, oPaciente.getNome());
@@ -28,7 +35,7 @@ public class PPaciente {
             preparedStatement.setString(6, oPaciente.getSexo());
             preparedStatement.setString(7, oPaciente.getTelefone());
             preparedStatement.execute();
-            String sql2 = " SELECT currval('paciente_id_seq') as codigo ";
+            String sql2 = " SELECT currval('tb_paciente_id_seq') as codigo ";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql2);
 
@@ -40,14 +47,14 @@ public class PPaciente {
             statement.close();;
             resultSet.close();
         } catch (SQLException ex) {
-            throw new Exception("Erro ao incluir");
+            Logger.getLogger(PPaciente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void alterar(EPaciente oPaciente) throws SQLException, Exception {
-        Connection connection = Conexao.getConexao();
+    public void alterar(EPaciente oPaciente) {
+        Connection connection = oBanco.getConexao();
         StringBuffer sql = new StringBuffer();
-        sql.append(" UPDATE paciente SET nome = ?, rg = ?, cpf = ?, endereco = ?, dt_nasc = ?, sexo = ?, telefone = ? WHERE id = ? ");
+        sql.append(" UPDATE tb_paciente SET nome = ?, rg = ?, cpf = ?, endereco = ?, dt_nasc = ?, sexo = ?, telefone = ? WHERE id = ? ");
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.toString());
             preparedStatement.setString(1, oPaciente.getNome());
@@ -55,65 +62,66 @@ public class PPaciente {
             preparedStatement.setString(3, oPaciente.getCpf());
             preparedStatement.setString(4, oPaciente.getEndereco());
             preparedStatement.setString(5, oPaciente.getDataNascimento());
-             preparedStatement.setString(6, oPaciente.getSexo());
+            preparedStatement.setString(6, oPaciente.getSexo());
             preparedStatement.setString(7, oPaciente.getTelefone());
             preparedStatement.setInt(8, oPaciente.getId());
             preparedStatement.execute();
             preparedStatement.close();
         }catch(SQLException erro) {
-            throw new Exception("Erro ao alterar");
+            erro.printStackTrace();
         }
     }
     
-    public void excluir(EPaciente oEPaciente) throws SQLException, Exception {
-        Connection connection = Conexao.getConexao();
+    public void excluir(Integer cod) {
+        Connection connection = oBanco.getConexao();
         StringBuffer sql = new StringBuffer();
-        sql.append(" DELETE FROM paciente WHERE id = ? ");
+        sql.append(" DELETE FROM tb_paciente WHERE id = ? ");
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql.toString());
-            preparedStatement.setInt(1, oEPaciente.getId());
+            preparedStatement.setInt(1, cod);
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException ex) {
-            throw new Exception("Erro ao excluir");
+            Logger.getLogger(PPaciente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public EPaciente consultar(int id) throws SQLException, Exception {
-        EPaciente oPaciente=new EPaciente();
-        Connection connection = Conexao.getConexao();
+    public EPaciente consultar(Integer cod) {
+        Connection connection = oBanco.getConexao();
         StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT * FROM paciente WHERE id = ? ");
+        sql.append(" SELECT * FROM tb_paciente WHERE id = ? ");
+        EPaciente oEPaciente = null;
         try{//nome,rg,cpf,endereco,dt_nasc,sexo,telefone
             PreparedStatement preparedStatement = connection.prepareStatement(sql.toString());
-            preparedStatement.setInt(1, oPaciente.getId());
+            preparedStatement.setInt(1, cod);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()) {
-                oPaciente.setId(resultSet.getInt("id"));
-                oPaciente.setNome(resultSet.getString("nome"));
-                oPaciente.setRg(resultSet.getString("rg"));
-                oPaciente.setCpf(resultSet.getString("cpf"));
-                oPaciente.setEndereco(resultSet.getString("endereco"));
-                oPaciente.setDataNascimento(resultSet.getString("dt_nasc"));
-                oPaciente.setSexo(resultSet.getString("sexo"));
-                oPaciente.setTelefone(resultSet.getString("telefone"));
+                oEPaciente = new EPaciente();
+                oEPaciente.setId(resultSet.getInt("id"));
+                oEPaciente.setNome(resultSet.getString("nome"));
+                oEPaciente.setRg(resultSet.getString("rg"));
+                oEPaciente.setCpf(resultSet.getString("cpf"));
+                oEPaciente.setEndereco(resultSet.getString("endereco"));
+                oEPaciente.setDataNascimento(resultSet.getString("dt_nasc"));
+                oEPaciente.setSexo(resultSet.getString("sexo"));
+                oEPaciente.setTelefone(resultSet.getString("telefone"));
             }
-            
+
             preparedStatement.close();
             resultSet.close();
         }catch(SQLException erro) {
-            throw new Exception("Erro ao pesquisar");
+            erro.printStackTrace();
         }
         
-        return oPaciente;
+        return oEPaciente;
     }
     
-    public ArrayList<EPaciente> listar() throws SQLException, Exception {
-        Connection connection = Conexao.getConexao();
+    public ArrayList<EPaciente> listar() {
+        Connection connection = oBanco.getConexao();
         ArrayList<EPaciente> lista = new ArrayList<>();
         EPaciente ePaciente = null;
         StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT * FROM paciente ORDER BY nome ");
+        sql.append(" SELECT * FROM tb_paciente ORDER BY nome ");
         try {//nome,rg,cpf,endereco,dt_nasc,sexo,telefone
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql.toString());
@@ -131,8 +139,19 @@ public class PPaciente {
             }
             
         } catch (SQLException ex) {
-            throw new Exception("Erro ao listar.");
+            Logger.getLogger(PPaciente.class.getName()).log(Level.SEVERE, null, ex);
         }        
         return lista;
     }
+    
+//    public static void main(String[] args) {
+//        PPaciente pPaciente = new PPaciente();
+//        ArrayList<EPaciente> lis = pPaciente.listar();
+//        for(EPaciente ePaciente : lis){
+//            System.out.println(ePaciente.getNome());
+//            System.out.println(ePaciente.getRg());
+//            System.out.println(ePaciente.getCpf());
+//            System.out.println(ePaciente.getSexo());
+//        }
+//    }
 }
