@@ -11,8 +11,8 @@ import entidade.EPaciente;
 import entidade.EProntuario;
 import java.sql.Date;
 import javax.swing.JOptionPane;
-import pesistencia.PPaciente;
-import pesistencia.PProntuario;
+import persistencia.PPaciente;
+import persistencia.PProntuario;
 
 /**
  *

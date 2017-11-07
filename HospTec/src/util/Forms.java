@@ -1,4 +1,4 @@
-package classes_hallef;
+package util;
 
 
 import java.awt.Dimension;

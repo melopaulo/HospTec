@@ -1,4 +1,4 @@
-package pesistencia;
+package persistencia;
 
 import entidade.EMedico;
 import entidade.EPaciente;
@@ -11,6 +11,8 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,10 +30,10 @@ public class PProntuario {
             Connection con = Conexao.getConexao();
             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-            java.sql.Date data = new java.sql.Date(fmt.parse(ePr.getData()).getTime());
-
-            stmt.setDate(1, data);
+            java.util.Date dataJava = new java.util.Date();//pega data atual do sistema
+            java.sql.Date dataSql= new java.sql.Date(dataJava.getTime());//converte a data para sql
+            
+            stmt.setDate(1, dataSql);
             stmt.setString(2, ePr.getDescricao());
             stmt.setString(3, ePr.getReceituario());
             stmt.setInt(4, ePr.getPaciente().getId());
